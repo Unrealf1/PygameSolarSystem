@@ -26,7 +26,7 @@ time_scale = 10000.0      #увеличить, если моделировани
 """Шаг по времени при моделировании.
 Тип: float"""
 
-space_objects = [solar_objects.Star(), solar_objects.Planet()]
+space_objects = []
 """Список космических объектов."""
 
 def execution(delta):
@@ -37,7 +37,7 @@ def execution(delta):
     """
     global model_time
     global displayed_time
-    solar_model.recalculate_space_objects_positions([dr for dr in space_objects], delta)
+    solar_model.recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
     model_time += delta
 
 

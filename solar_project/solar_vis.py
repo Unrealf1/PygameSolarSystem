@@ -87,4 +87,4 @@ class DrawableObject:
 
     def drawOn(self, surface):
         object_ = self.obj
-        circle(surface, object_.color, (scale_x(object_.x), scale_y(object_.y)), object_.R)
+        circle(surface, object_.obj.color, (scale_x(object_.obj.x), scale_y(object_.obj.y)), object_.obj.R)
