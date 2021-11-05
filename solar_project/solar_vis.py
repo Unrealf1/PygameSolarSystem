@@ -3,6 +3,7 @@
 
 import pygame as pg
 from pygame.draw import *
+import color
 
 """Модуль визуализации.
 Нигде, кроме этого модуля, не используются экранные координаты объектов.
@@ -87,4 +88,4 @@ class DrawableObject:
 
     def drawOn(self, surface):
         object_ = self.obj
-        circle(surface, object_.obj.color, (scale_x(object_.obj.x), scale_y(object_.obj.y)), object_.obj.R)
+        circle(surface, color.color_dict[object_.obj.color], (scale_x(object_.obj.x), scale_y(object_.obj.y)), object_.obj.R)
