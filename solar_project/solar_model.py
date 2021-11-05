@@ -1,5 +1,8 @@
 # coding: utf-8
 # license: GPLv3
+import solar_plot_data
+import time
+from solar_main import time_scale
 
 gravitational_constant = 6.67408E-11
 """Гравитационная постоянная Ньютона G"""
@@ -25,6 +28,13 @@ def calculate_force(body, space_objects):
         body.Fy += -gravitational_constant * obj.m * body.m * (body.y - obj.y) / r ** 3
 
 
+def record_data(body):
+    v = (body.Vx**2 + body.Vy**2)**0.5
+    r = (body.x**2 + body.y**2)**0.5
+    t = time.perf_counter() * time_scale
+    
+    solar_plot_data.recorded_data.add_frame_data(v, r, t)
+    
 def move_space_object(body, dt):
     """Перемещает тело в соответствии с действующей на него силой.
 
@@ -53,6 +63,8 @@ def recalculate_space_objects_positions(space_objects, dt):
         calculate_force(body, space_objects)
     for body in space_objects:
         move_space_object(body, dt)
+    
+    if(space_objects != []): record_data(space_objects[0])
 
 
 if __name__ == "__main__":

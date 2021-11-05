@@ -3,6 +3,7 @@
 
 import pygame as pg
 import solar_vis, solar_model, solar_input, solar_objects
+import solar_plot_data
 #from solar_vis import *
 #from solar_model import *
 #from solar_input import *
@@ -22,7 +23,7 @@ model_time = 0
 """Физическое время от начала расчёта.
 Тип: float"""
 
-time_scale = 10000.0      #увеличить, если моделирование слишком грубое
+time_scale = 10000.0      #уменьшить, если моделирование слишком грубое
 """Шаг по времени при моделировании.
 Тип: float"""
 
@@ -69,7 +70,7 @@ def open_file():
     global model_time
 
     model_time = 0.0
-    in_filename = "solar_system.txt"
+    in_filename = "one_satellite.txt"
     space_objects = solar_input.read_space_objects_data_from_file(in_filename)
     max_distance = max([max(abs(obj.obj.x), abs(obj.obj.y)) for obj in space_objects])
     solar_vis.calculate_scale_factor(max_distance)
@@ -80,6 +81,7 @@ def handle_events(events, menu):
         menu.react(event)
         if event.type == pg.QUIT:
             alive = False
+            
 
 def slider_to_real(val):
     return np.exp(5 + val)
@@ -164,6 +166,7 @@ def main():
         time.sleep(1.0 / FPS)
 
     print('Modelling finished!')
+    solar_plot_data.recorded_data.save_plots()
 
 if __name__ == "__main__":
     main()
