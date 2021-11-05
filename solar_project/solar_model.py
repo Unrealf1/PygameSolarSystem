@@ -1,5 +1,8 @@
 # coding: utf-8
 # license: GPLv3
+import solar_plot_data
+import time
+from solar_main import time_scale
 
 gravitational_constant = 6.67408E-11
 """Гравитационная постоянная Ньютона G"""
@@ -20,11 +23,18 @@ def calculate_force(body, space_objects):
         if body == obj:
             continue  # тело не действует гравитационной силой на само себя!
         r = ((body.x - obj.x)**2 + (body.y - obj.y)**2)**0.5
-        r = max(r, body.R + obj.R) # обработка аномалий при прохождении одного тела сквозь другое
-        body.Fx += -gravitational_constant*obj.m*body.m*(body.x - obj.x)/r**3
-        body.Fy += -gravitational_constant*obj.m*body.m*(body.y - obj.y)/r**3
+        r = max(r, body.R + obj.R)  # обработка аномалий при прохождении одного тела сквозь другое
+        body.Fx += -gravitational_constant * obj.m * body.m * (body.x - obj.x) / r ** 3
+        body.Fy += -gravitational_constant * obj.m * body.m * (body.y - obj.y) / r ** 3
 
 
+def record_data(body):
+    v = (body.Vx**2 + body.Vy**2)**0.5
+    r = (body.x**2 + body.y**2)**0.5
+    t = time.perf_counter() / time_scale
+    
+    solar_plot_data.recorded_data.add_frame_data(v, r, t)
+    
 def move_space_object(body, dt):
     """Перемещает тело в соответствии с действующей на него силой.
 
@@ -32,13 +42,12 @@ def move_space_object(body, dt):
 
     **body** — тело, которое нужно переместить.
     """
-    old = body.x
-    ax = body.Fx/body.m
-    body.x += body.Vx*dt + ax*dt**2/2
-    body.Vx += ax*dt
-    ay = body.Fy/body.m
-    body.y += body.Vy*dt + ay*dt**2/2
-    body.Vy += ay*dt
+    ax = body.Fx / body.m
+    body.Vx += ax * dt
+    body.x += body.Vx * dt
+    ay = body.Fy / body.m
+    body.Vy += ay * dt
+    body.y += body.Vy * dt
 
 
 def recalculate_space_objects_positions(space_objects, dt):
@@ -54,6 +63,8 @@ def recalculate_space_objects_positions(space_objects, dt):
         calculate_force(body, space_objects)
     for body in space_objects:
         move_space_object(body, dt)
+    
+    if(space_objects != []): record_data(space_objects[0])
 
 
 if __name__ == "__main__":

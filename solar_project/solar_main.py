@@ -2,10 +2,12 @@
 # license: GPLv3
 
 import pygame as pg
-from solar_vis import *
-from solar_model import *
-from solar_input import *
-from solar_objects import *
+import solar_vis, solar_model, solar_input, solar_objects
+import solar_plot_data
+#from solar_vis import *
+#from solar_model import *
+#from solar_input import *
+#from solar_objects import *
 import thorpy
 import time
 import numpy as np
@@ -21,7 +23,7 @@ model_time = 0
 """Физическое время от начала расчёта.
 Тип: float"""
 
-time_scale = 1000.0
+time_scale = 10000.0      #уменьшить, если моделирование слишком грубое
 """Шаг по времени при моделировании.
 Тип: float"""
 
@@ -36,7 +38,7 @@ def execution(delta):
     """
     global model_time
     global displayed_time
-    recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
+    solar_model.recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
     model_time += delta
 
 
@@ -68,10 +70,10 @@ def open_file():
     global model_time
 
     model_time = 0.0
-    in_filename = "solar_system.txt"
-    space_objects = read_space_objects_data_from_file(in_filename)
+    in_filename = "one_satellite.txt"
+    space_objects = solar_input.read_space_objects_data_from_file(in_filename)
     max_distance = max([max(abs(obj.obj.x), abs(obj.obj.y)) for obj in space_objects])
-    calculate_scale_factor(max_distance)
+    solar_vis.calculate_scale_factor(max_distance)
 
 def handle_events(events, menu):
     global alive
@@ -79,6 +81,7 @@ def handle_events(events, menu):
         menu.react(event)
         if event.type == pg.QUIT:
             alive = False
+            
 
 def slider_to_real(val):
     return np.exp(5 + val)
@@ -89,7 +92,7 @@ def slider_reaction(event):
 
 def init_ui(screen):
     global browser
-    slider = thorpy.SliderX(100, (-10, 10), "Simulation speed")
+    slider = thorpy.SliderX(100, (-15, 15), "Simulation speed")
     slider.user_func = slider_reaction
     button_stop = thorpy.make_button("Quit", func=stop_execution)
     button_pause = thorpy.make_button("Pause", func=pause_execution)
@@ -142,9 +145,11 @@ def main():
     
     width = 1000
     height = 900
+    FPS = 200
+    
     screen = pg.display.set_mode((width, height))
     last_time = time.perf_counter()
-    drawer = Drawer(screen)
+    drawer = solar_vis.Drawer(screen)
     menu, box, timer = init_ui(screen)
     perform_execution = True
 
@@ -157,10 +162,11 @@ def main():
             timer.set_text(text)
 
         last_time = cur_time
-        drawer.update(space_objects, box)
-        time.sleep(1.0 / 60)
+        drawer.update([solar_vis.DrawableObject(space_object) for space_object in space_objects], box)
+        time.sleep(1.0 / FPS)
 
     print('Modelling finished!')
+    solar_plot_data.recorded_data.save_plots()
 
 if __name__ == "__main__":
     main()
