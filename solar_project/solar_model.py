@@ -31,7 +31,7 @@ def calculate_force(body, space_objects):
 def record_data(body):
     v = (body.Vx**2 + body.Vy**2)**0.5
     r = (body.x**2 + body.y**2)**0.5
-    t = time.perf_counter() * time_scale
+    t = time.perf_counter() / time_scale
     
     solar_plot_data.recorded_data.add_frame_data(v, r, t)
     
