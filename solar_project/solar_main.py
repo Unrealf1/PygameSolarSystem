@@ -2,10 +2,11 @@
 # license: GPLv3
 
 import pygame as pg
-from solar_vis import *
-from solar_model import *
-from solar_input import *
-from solar_objects import *
+import solar_vis, solar_model, solar_input, solar_objects
+#from solar_vis import *
+#from solar_model import *
+#from solar_input import *
+#from solar_objects import *
 import thorpy
 import time
 import numpy as np
@@ -36,7 +37,7 @@ def execution(delta):
     """
     global model_time
     global displayed_time
-    recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
+    solar_model.recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
     model_time += delta
 
 
@@ -69,9 +70,9 @@ def open_file():
 
     model_time = 0.0
     in_filename = "solar_system.txt"
-    space_objects = read_space_objects_data_from_file(in_filename)
+    space_objects = solar_input.read_space_objects_data_from_file(in_filename)
     max_distance = max([max(abs(obj.obj.x), abs(obj.obj.y)) for obj in space_objects])
-    calculate_scale_factor(max_distance)
+    solar_vis.calculate_scale_factor(max_distance)
 
 def handle_events(events, menu):
     global alive
@@ -144,7 +145,7 @@ def main():
     height = 900
     screen = pg.display.set_mode((width, height))
     last_time = time.perf_counter()
-    drawer = Drawer(screen)
+    drawer = solar_vis.Drawer(screen)
     menu, box, timer = init_ui(screen)
     perform_execution = True
 
