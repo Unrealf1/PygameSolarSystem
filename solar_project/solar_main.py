@@ -22,11 +22,11 @@ model_time = 0
 """Физическое время от начала расчёта.
 Тип: float"""
 
-time_scale = 1000.0
+time_scale = 10000.0      #увеличить, если моделирование слишком грубое
 """Шаг по времени при моделировании.
 Тип: float"""
 
-space_objects = []
+space_objects = [solar_objects.Star(), solar_objects.Planet()]
 """Список космических объектов."""
 
 def execution(delta):
@@ -37,7 +37,7 @@ def execution(delta):
     """
     global model_time
     global displayed_time
-    solar_model.recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
+    solar_model.recalculate_space_objects_positions([dr for dr in space_objects], delta)
     model_time += delta
 
 
@@ -143,6 +143,8 @@ def main():
     
     width = 1000
     height = 900
+    FPS = 60
+    
     screen = pg.display.set_mode((width, height))
     last_time = time.perf_counter()
     drawer = solar_vis.Drawer(screen)
@@ -158,8 +160,8 @@ def main():
             timer.set_text(text)
 
         last_time = cur_time
-        drawer.update(space_objects, box)
-        time.sleep(1.0 / 60)
+        drawer.update([solar_vis.DrawableObject(space_object) for space_object in space_objects], box)
+        time.sleep(1.0 / FPS)
 
     print('Modelling finished!')
 
